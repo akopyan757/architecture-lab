@@ -1,0 +1,36 @@
+name: Пост в канал
+
+# Отправка/правка поста в телеграм-канале через Bot API. Секреты
+# (TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL) читаются только внутри джобы и нигде
+# не показываются — post.sh сам проверяет, что адресат канал, а не переписка.
+
+on:
+  workflow_dispatch:
+    inputs:
+      post:
+        description: 'Файл поста (например posts/ssot.html)'
+        required: true
+      message_id:
+        description: 'message_id для правки существующего поста (пусто — новый)'
+        required: false
+        default: ''
+
+jobs:
+  post:
+    name: Пост в канал
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Отправить
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
+          FILE: ${{ inputs.post }}
+          MESSAGE_ID: ${{ inputs.message_id }}
+        run: |
+          if [ -n "$MESSAGE_ID" ]; then
+            .claude/skills/q-publish/post.sh "$FILE" --edit "$MESSAGE_ID"
+          else
+            .claude/skills/q-publish/post.sh "$FILE"
+          fi

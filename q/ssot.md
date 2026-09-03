@@ -1,6 +1,8 @@
 # SSOT: как понять, что он нарушен, и чем это чинится
 
-issue: [#8](https://github.com/akopyan757/architecture-lab/issues/8) · раздел: [1. Состояние и поток данных](../architecture-map.md)
+Issue: [#8](https://github.com/akopyan757/architecture-lab/issues/8) · раздел: [1. Состояние и поток данных](../architecture-map.md)
+
+**Доказано:** нечем — рассуждение и разбор кода в тексте, отдельного стенда нет
 
 ## Что это
 

@@ -1,26 +1,117 @@
-name: Пост в канал
+name: Разбор
 
-# Отправка/правка поста в телеграм-канале через Bot API. Секреты
-# (TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL) читаются только внутри джобы и нигде
-# не показываются — post.sh сам проверяет, что адресат канал, а не переписка.
+# Цикл публикации одной кнопкой, стадиями: проверка доказательств → заливка в
+# Telegra.ph → пост в канал. Каждая следующая стадия зависит от предыдущей,
+# поэтому запостить разбор без приложенного доказательства нельзя технически.
+#
+# CI-стендов здесь нет намеренно: архитектурное решение проверяется тем, как
+# оно ведёт себя на длинной дистанции, а не прогоном за минуту в Actions.
+# Вместо зелёного check.sh проверяется, что у разбора есть строка
+# «**Доказано:** ...» и что файлы, на которые она ссылается, лежат в репозитории.
+# Смотреть на них — работа человека, воркфлоу отвечает только за «приложено».
+#
+# Стадии включаются входными полями. Пустое поле — стадия пропускается:
+#   files пусто, post пусто  → только проверка доказательств
+#   files заполнено          → проверка + заливка страниц
+#   post заполнен            → проверка + (заливка) + отправка в канал
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'q/**'
+      - 'tools/check-evidence.py'
+      - '.github/workflows/publish.yml'
+  pull_request:
+    paths:
+      - 'q/**'
   workflow_dispatch:
     inputs:
+      files:
+        description: 'Разборы для заливки в Telegra.ph (маска или список; пусто — не заливать)'
+        required: false
+        default: ''
       post:
-        description: 'Файл поста (например posts/ssot.html)'
-        required: true
+        description: 'Файл поста в канал (пусто — не постить)'
+        required: false
+        default: ''
       message_id:
         description: 'message_id для правки существующего поста (пусто — новый)'
         required: false
         default: ''
 
 jobs:
-  post:
-    name: Пост в канал
+  evidence:
+    name: Доказательства приложены
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 tools/check-evidence.py
+
+  telegraph:
+    name: Заливка в Telegra.ph
+    needs: [evidence]
+    if: github.event_name == 'workflow_dispatch' && inputs.files != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      # Репозиторий приватный, ссылки в канале ведут на Telegra.ph. Скрипт сам
+      # решает, создать страницу или обновить: соответствие «файл → страница»
+      # лежит в telegraph.json, адрес при перезаливке не меняется.
+      - name: Залить страницы
+        env:
+          TELEGRAPH_TOKEN: ${{ secrets.TELEGRAPH_TOKEN }}
+          FILES: ${{ inputs.files }}
+        run: |
+          if [ -z "$TELEGRAPH_TOKEN" ]; then
+            echo "нет секрета TELEGRAPH_TOKEN: без него нельзя править уже созданные страницы"
+            exit 1
+          fi
+          # Маску раскрывает оболочка, а не питон: список файлов приходит строкой.
+          eval "python3 tools/md-to-telegraph.py $FILES"
+
+      # Без этого следующий запуск сочтёт страницы несуществующими и наплодит дублей.
+      - name: Вернуть telegraph.json в репозиторий
+        run: |
+          git add -A telegraph.json
+          if git diff --cached --quiet -- telegraph.json; then
+            echo "telegraph.json не изменился — новых страниц нет"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Telegra.ph: адреса залитых страниц"
+          git push
+
+  post:
+    name: Пост в канал
+    needs: [evidence, telegraph]
+    # telegraph может быть пропущена (постим без перезаливки) — это допустимо,
+    # но упавшая telegraph постить не даёт: ссылки были бы битые.
+    if: >-
+      always()
+      && github.event_name == 'workflow_dispatch'
+      && inputs.post != ''
+      && needs.evidence.result == 'success'
+      && (needs.telegraph.result == 'success' || needs.telegraph.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      # Ветка, а не SHA запуска: telegraph выше мог дописать коммит.
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref_name }}
 
       - name: Отправить
         env:

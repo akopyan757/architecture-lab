@@ -10,7 +10,7 @@
   "channel": "Architecture Knowledge",
   "evidence": "artifact",
   "sections": "issues #1-#7",
-  "issue_body_style": "bare",
+  "issue_body_style": "headered",
   "label_scheme": null,
   "sections_detail": [
     { "number": 1, "name": "Состояние и поток данных", "topic": "Состояние и поток данных", "parent_issue": 1 },

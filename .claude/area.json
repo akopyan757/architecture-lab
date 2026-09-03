@@ -9,5 +9,33 @@
   "posts": "posts/",
   "channel": "Architecture Knowledge",
   "evidence": "artifact",
-  "sections": "issues"
+  "sections": "issues #1-#7",
+  "issue_body_style": "bare",
+  "label_scheme": null,
+  "sections_detail": [
+    { "number": 1, "name": "Состояние и поток данных", "topic": "Состояние и поток данных", "parent_issue": 1 },
+    { "number": 2, "name": "Слои и границы", "topic": "Слои и границы", "parent_issue": 2 },
+    { "number": 3, "name": "Зависимости и время жизни", "topic": "Зависимости и время жизни", "parent_issue": 3 },
+    { "number": 4, "name": "Данные (SSOT и синхронизация)", "topic": "Данные: источник истины и синхронизация", "parent_issue": 4 },
+    { "number": 5, "name": "Навигация и время жизни экранов", "topic": "Навигация и время жизни экранов", "parent_issue": 5 },
+    { "number": 6, "name": "Модуляризация", "topic": "Модуляризация", "parent_issue": 6 },
+    { "number": 7, "name": "Эволюция и деградация", "topic": "Эволюция и деградация", "parent_issue": 7 }
+  ],
+  "evidence_table": [
+    { "topic": "форму состояния, границы слоёв", "evidence": "минимальный код в q/<slug>/, где решение и его альтернатива стоят рядом" },
+    { "topic": "время жизни, скоупы зависимостей", "evidence": "граф зависимостей или лог создания/уничтожения, приложенный файлом" },
+    { "topic": "синхронизацию и источник истины", "evidence": "сценарий расхождения: код или последовательность шагов, на которых оно воспроизводится" },
+    { "topic": "модуляризацию", "evidence": "граф модулей или замер времени сборки до и после" },
+    { "topic": "деградацию и эволюцию", "evidence": "разбор на живом коде — своём или чужом, со ссылкой на коммит" },
+    { "topic": "решение, принятое осознанно", "evidence": "ADR в q/<slug>/: контекст, варианты, выбор и предпосылки, которые можно перепроверить" }
+  ],
+  "evidence_note": "картинки не переносятся в Telegra.ph — если доказательство визуальное (граф, диаграмма), перескажи его в разборе цифрами/текстом",
+  "telegraph_short_name": "architecture-lab",
+  "telegraph_author": "Architecture Knowledge",
+  "post_emoji": "🏗️",
+  "hashtags_base": "#architecture",
+  "hashtags_sections": { "1": "#state", "2": "#layers", "3": "#di", "4": "#data", "5": "#navigation", "6": "#modules", "7": "#evolution" },
+  "post_extra_line": "context",
+  "extra_split_trigger": null,
+  "extra_dont": []
 }

@@ -21,7 +21,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MAP_FILE = ROOT / "telegraph.json"
 API = "https://api.telegra.ph/"
-AUTHOR = "Kotlin Knowledge"
+AUTHOR = "Architecture Knowledge"
 
 # Telegra.ph принимает узкий набор тегов: ни таблиц, ни h1/h2, ни вложенных
 # блоков. Таблица разворачивается в список, ## → h3, ### → h4.

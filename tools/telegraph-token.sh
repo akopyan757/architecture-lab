@@ -13,11 +13,11 @@
 # есть» проходит, а заливка падает позже и непонятно почему.
 set -euo pipefail
 
-REPO="${REPO:-akopyan757/kotlin-lab}"
-FILE="$HOME/.telegraph-kotlin-lab-token"
-DESKTOP_COPY="$HOME/Desktop/telegraph-kotlin-lab-token.txt"
-SHORT_NAME="kotlin-lab"
-AUTHOR="Kotlin Knowledge"        # совпадает с AUTHOR в md-to-telegraph.py
+REPO="${REPO:-akopyan757/architecture-lab}"
+FILE="$HOME/.telegraph-architecture-lab-token"
+DESKTOP_COPY="$HOME/Desktop/telegraph-architecture-lab-token.txt"
+SHORT_NAME="architecture-lab"
+AUTHOR="Architecture Knowledge"   # совпадает с AUTHOR в md-to-telegraph.py
 
 if [ -s "$FILE" ]; then
   echo "В $FILE уже что-то лежит. Удали файл руками, если правда нужен новый"

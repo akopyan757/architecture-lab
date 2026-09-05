@@ -3,5 +3,10 @@
     "path": "modelirovanie-sostoyaniya-sealed-vs-flagi-nevozmozhnye-sostoyaniya-09-03",
     "url": "https://telegra.ph/modelirovanie-sostoyaniya-sealed-vs-flagi-nevozmozhnye-sostoyaniya-09-03",
     "title": "моделирование состояния: sealed vs флаги, невозможные состояния"
+  },
+  "q/flags-to-sealed-cost.md": {
+    "path": "stoimost-migracii-flagovoj-modeli-v-sealed-na-zhivom-proekte-09-05",
+    "url": "https://telegra.ph/stoimost-migracii-flagovoj-modeli-v-sealed-na-zhivom-proekte-09-05",
+    "title": "стоимость миграции флаговой модели в sealed на живом проекте"
   }
 }

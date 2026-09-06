@@ -24,6 +24,11 @@ jobs:
         run: |
           set -euo pipefail
 
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "::warning::секрет POOL_PROJECT_TOKEN не задан — карточка на доску пула не добавлена"
+            exit 0
+          fi
+
           project_id=$(gh project view "$PROJECT" --owner "$OWNER" --format json --jq .id)
           item_id=$(gh project item-add "$PROJECT" --owner "$OWNER" --url "$ISSUE_URL" --format json --jq .id)
 

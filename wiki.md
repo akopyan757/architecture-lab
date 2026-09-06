@@ -50,3 +50,11 @@ Issue: [#83](https://github.com/akopyan757/architecture-lab/issues/83) —
 Файл правится вручную при закрытии разбора: адреса страниц берутся из
 [`telegraph.json`](telegraph.json), он — источник истины по «файл → страница».
 Если здесь чего-то нет, а в `telegraph.json` есть — прав `telegraph.json`.
+
+Пост-указатель в канале: `message_id = 8` — [https://t.me/c/3742587835/8](https://t.me/c/3742587835/8). Правится, а не
+публикуется заново: закреп в канале один, и новый пост вытеснит старый, а
+ссылки из него останутся ходить по подписчикам.
+
+```bash
+gh workflow run publish.yml -f post=posts/index.html -f message_id=8
+```

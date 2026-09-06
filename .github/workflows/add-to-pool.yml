@@ -2,6 +2,9 @@ name: Add to Knowledge Pool
 
 # Новая issue этой области попадает на общую доску пула (проект №11)
 # и сразу получает пометку area. Статус и итерацию ставит человек.
+#
+# Доска адресуется своим node id, а не парой owner+номер: у токена нет прав
+# на определение типа владельца, и gh project --owner падает с "unknown owner type".
 
 on:
   issues:
@@ -17,9 +20,9 @@ jobs:
       - name: Add issue to Knowledge Pool and tag area
         env:
           GH_TOKEN: ${{ secrets.POOL_PROJECT_TOKEN }}
+          ISSUE_ID: ${{ github.event.issue.node_id }}
           ISSUE_URL: ${{ github.event.issue.html_url }}
-          OWNER: akopyan757
-          PROJECT: "11"
+          PROJECT_ID: PVT_kwHOAS7zK84Binnz
           AREA: "Architecture"
         run: |
           set -euo pipefail
@@ -29,22 +32,30 @@ jobs:
             exit 0
           fi
 
-          project_id=$(gh project view "$PROJECT" --owner "$OWNER" --format json --jq .id)
-          item_id=$(gh project item-add "$PROJECT" --owner "$OWNER" --url "$ISSUE_URL" --format json --jq .id)
+          item_id=$(gh api graphql -f query='
+            mutation($p:ID!, $c:ID!){
+              addProjectV2ItemById(input:{projectId:$p, contentId:$c}){ item{ id } }
+            }' -f p="$PROJECT_ID" -f c="$ISSUE_ID" \
+            --jq .data.addProjectV2ItemById.item.id)
 
-          fields=$(gh project field-list "$PROJECT" --owner "$OWNER" --format json)
-          field_id=$(jq -r '.fields[] | select(.name=="area") | .id' <<<"$fields")
-          option_id=$(jq -r --arg a "$AREA" '.fields[] | select(.name=="area") | .options[] | select(.name==$a) | .id' <<<"$fields")
+          fields=$(gh api graphql -f query='
+            query($p:ID!){ node(id:$p){ ... on ProjectV2 {
+              fields(first:30){ nodes{ ... on ProjectV2SingleSelectField{ id name options{ id name } } } }
+            } } }' -f p="$PROJECT_ID")
+
+          field_id=$(jq -r '.data.node.fields.nodes[] | select(.name=="area") | .id' <<<"$fields")
+          option_id=$(jq -r --arg a "$AREA" '.data.node.fields.nodes[] | select(.name=="area") | .options[] | select(.name==$a) | .id' <<<"$fields")
 
           if [ -z "$option_id" ] || [ "$option_id" = "null" ]; then
             echo "::error::на доске нет варианта area=$AREA"
             exit 1
           fi
 
-          gh project item-edit \
-            --id "$item_id" \
-            --project-id "$project_id" \
-            --field-id "$field_id" \
-            --single-select-option-id "$option_id"
+          gh api graphql -f query='
+            mutation($p:ID!, $i:ID!, $f:ID!, $o:String!){
+              updateProjectV2ItemFieldValue(input:{
+                projectId:$p, itemId:$i, fieldId:$f, value:{singleSelectOptionId:$o}
+              }){ projectV2Item{ id } }
+            }' -f p="$PROJECT_ID" -f i="$item_id" -f f="$field_id" -f o="$option_id" >/dev/null
 
           echo "$ISSUE_URL -> пул, area=$AREA"

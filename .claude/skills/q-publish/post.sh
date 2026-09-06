@@ -1,11 +1,29 @@
 #!/usr/bin/env bash
 # Отправка поста в телеграм-канал через Bot API.
-#   post.sh <файл-с-html>                — новый пост
-#   post.sh <файл-с-html> --edit <msg_id> — правка существующего
+#   post.sh <файл-с-html>                 — новый пост
+#   post.sh <файл-с-html> --edit <msg_id>  — правка существующего
+#   post.sh <файл-с-html> --pin            — отправить и закрепить в канале
 # Нужны TELEGRAM_BOT_TOKEN и TELEGRAM_CHANNEL в окружении.
 set -eu
 
-file="${1:?укажи файл с текстом поста}"
+file=""
+pin=0
+method="sendMessage"
+extra=()
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --edit)
+      method="editMessageText"
+      extra=(--data-urlencode "message_id=${2:?укажи message_id}")
+      shift 2 ;;
+    --pin) pin=1; shift ;;
+    -*) echo "неизвестный ключ: $1" >&2; exit 1 ;;
+    *) file="$1"; shift ;;
+  esac
+done
+
+: "${file:?укажи файл с текстом поста}"
 : "${TELEGRAM_BOT_TOKEN:?нет TELEGRAM_BOT_TOKEN в окружении}"
 : "${TELEGRAM_CHANNEL:?нет TELEGRAM_CHANNEL в окружении (@канал или chat_id)}"
 
@@ -36,14 +54,6 @@ if r.get("type") != "channel":
 print(f"канал: {r.get('title')}")
 PY_CHECK
 
-method="sendMessage"
-extra=()
-
-if [ "${2:-}" = "--edit" ]; then
-  method="editMessageText"
-  extra=(--data-urlencode "message_id=${3:?укажи message_id}")
-fi
-
 resp=$(curl -sS "$api/$method" \
   --data-urlencode "chat_id=${chat}" \
   --data-urlencode "parse_mode=HTML" \
@@ -72,4 +82,26 @@ else:
 PY
 else
   echo "$resp"
+fi
+
+# Закрепление отдельным вызовом: sendMessage этого не умеет. Пост уже ушёл и
+# необратим, поэтому неудачное закрепление — предупреждение, а не ошибка:
+# чаще всего у бота просто нет права «закреплять сообщения» в канале, и это
+# чинится в правах бота, а не перепосылкой.
+if [ "$pin" = 1 ]; then
+  msg_id=$(printf '%s' "$resp" | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"]["message_id"])')
+  pin_resp=$(curl -sS "$api/pinChatMessage" \
+    --data-urlencode "chat_id=${chat}" \
+    --data-urlencode "message_id=${msg_id}" \
+    --data-urlencode "disable_notification=true")
+  python3 - "$pin_resp" <<'PY_PIN'
+import json, sys
+d = json.loads(sys.argv[1])
+if d.get("ok"):
+    print("закреплено")
+else:
+    desc = d.get("description", "")
+    hint = " — у бота нет права «закреплять сообщения» в канале" if "not enough rights" in desc else ""
+    print("пост отправлен, но закрепить не вышло:", desc + hint, file=sys.stderr)
+PY_PIN
 fi

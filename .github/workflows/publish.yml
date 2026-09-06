@@ -39,6 +39,11 @@ on:
         description: 'message_id для правки существующего поста (пусто — новый)'
         required: false
         default: ''
+      pin:
+        description: 'Закрепить пост в канале (для постов-указателей)'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   evidence:
@@ -119,9 +124,9 @@ jobs:
           TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
           FILE: ${{ inputs.post }}
           MESSAGE_ID: ${{ inputs.message_id }}
+          PIN: ${{ inputs.pin }}
         run: |
-          if [ -n "$MESSAGE_ID" ]; then
-            .claude/skills/q-publish/post.sh "$FILE" --edit "$MESSAGE_ID"
-          else
-            .claude/skills/q-publish/post.sh "$FILE"
-          fi
+          args=("$FILE")
+          if [ -n "$MESSAGE_ID" ]; then args+=(--edit "$MESSAGE_ID"); fi
+          if [ "$PIN" = "true" ]; then args+=(--pin); fi
+          .claude/skills/q-publish/post.sh "${args[@]}"

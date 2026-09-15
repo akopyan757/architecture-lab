@@ -20,6 +20,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 MAP_FILE = ROOT / "telegraph.json"
+# якоря заголовков текущего файла, заполняется в convert()
+ANCHORS = {}
 API = "https://api.telegra.ph/"
 AUTHOR = "Architecture Knowledge"
 
@@ -71,12 +73,35 @@ def inline(text, src, pages):
     return out or [""]
 
 
+def gh_slug(text):
+    """Якорь в формате GitHub: нижний регистр, пунктуация выброшена,
+    пробелы в дефисы. Так якоря пишутся в markdown."""
+    text = re.sub(r"[`*]", "", text).strip()
+    text = re.sub(r"[^\w\s-]", "", text, flags=re.UNICODE)
+    return re.sub(r"\s+", "-", text).lower()
+
+
+def tg_id(text):
+    """Якорь в формате Telegra.ph: он вешает на h3/h4 атрибут id, где от
+    текста заголовка меняются только пробелы — на дефисы."""
+    return re.sub(r"\s+", "-", re.sub(r"[`*]", "", text).strip())
+
+
 def link_node(label, href, src, pages):
     """Внешняя ссылка остаётся ссылкой. Ссылка на соседний разбор становится
-    ссылкой на его страницу. Всё остальное (код, карта) — просто жирный текст:
+    ссылкой на его страницу, ссылка на якорь своего же текста — ссылкой на
+    заголовок этой страницы. Всё остальное (код, карта) — просто жирный текст:
     в приватную репу вести некуда."""
     if href.startswith("http"):
         return {"tag": "a", "attrs": {"href": href}, "children": inline(label, src, pages)}
+    if href.startswith("#"):
+        # оглавление: markdown-якорь переводится в якорь Telegra.ph, адрес
+        # берётся свой же — до первой заливки его ещё нет, тогда жирный текст
+        page, anchor = pages.get(src), ANCHORS.get(href[1:])
+        if page and anchor:
+            return {"tag": "a", "attrs": {"href": f"{page['url']}#{anchor}"},
+                    "children": inline(label, src, pages)}
+        return {"tag": "strong", "children": inline(label, src, pages)}
     target = os.path.normpath(os.path.join(os.path.dirname(src), href.split("#")[0]))
     page = pages.get(target)
     if page:
@@ -88,6 +113,13 @@ def convert(path, pages):
     src = str(Path(path).relative_to(ROOT))
     lines = Path(path).read_text().split("\n")
     title = re.sub(r"[`*]", "", lines[0].lstrip("# ")).strip()
+
+    # заголовки файла: markdown-якорь → якорь Telegra.ph, для оглавления
+    ANCHORS.clear()
+    for ln in lines:
+        if ln.startswith("## ") or ln.startswith("### "):
+            head = ln.lstrip("#").strip()
+            ANCHORS[gh_slug(head)] = tg_id(head)
     nodes, para, bullets, table = [], [], [], []
     ordered = False
 

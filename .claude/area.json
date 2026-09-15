@@ -1,8 +1,9 @@
 {
-  "_": "Факты области в машиночитаемом виде. Отсюда их берут скилл q-publish, сторож статусов в pool-digest и телеграм-бот, чтобы одни и те же номера и пути не расползались по прозе.",
+  "_": "Факты области в машиночитаемом виде. Отсюда их берут скилл q-publish, сторож статусов в pool-digest и телеграм-бот, чтобы одни и те же номера и пути не расползались по прозе. board — доска, где живёт статус вопроса: она одна на все области, Knowledge Pool. map_board — доска самой области: topic, needs code, Iteration; статусов на ней больше нет.",
   "area": "Architecture",
   "repo": "akopyan757/architecture-lab",
-  "board": 9,
+  "board": 11,
+  "map_board": 9,
   "map": "architecture-map.md",
   "answers": "q/",
   "telegraph": "telegraph.json",

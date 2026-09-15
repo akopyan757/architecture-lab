@@ -23,5 +23,10 @@
     "path": "state--event--one-time-effect-pochemu-effect-ne-zhivyot-v-state-09-13",
     "url": "https://telegra.ph/state--event--one-time-effect-pochemu-effect-ne-zhivyot-v-state-09-13",
     "title": "state / event / one-time effect: почему effect не живёт в state"
+  },
+  "q/sealed-as-debt.md": {
+    "path": "kogda-sealed-ierarhiya-sama-stanovitsya-dolgom-09-15",
+    "url": "https://telegra.ph/kogda-sealed-ierarhiya-sama-stanovitsya-dolgom-09-15",
+    "title": "когда sealed-иерархия сама становится долгом"
   }
 }

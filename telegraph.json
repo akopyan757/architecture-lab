@@ -28,5 +28,10 @@
     "path": "kogda-sealed-ierarhiya-sama-stanovitsya-dolgom-09-15",
     "url": "https://telegra.ph/kogda-sealed-ierarhiya-sama-stanovitsya-dolgom-09-15",
     "title": "когда sealed-иерархия сама становится долгом"
+  },
+  "q/process-death-state.md": {
+    "path": "sostoyanie-perezhivayushchee-smert-processa-UI-state-vs-persisted-09-18",
+    "url": "https://telegra.ph/sostoyanie-perezhivayushchee-smert-processa-UI-state-vs-persisted-09-18",
+    "title": "состояние, переживающее смерть процесса: UI-state vs persisted"
   }
 }

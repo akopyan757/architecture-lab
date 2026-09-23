@@ -33,5 +33,10 @@
     "path": "sostoyanie-perezhivayushchee-smert-processa-UI-state-vs-persisted-09-18",
     "url": "https://telegra.ph/sostoyanie-perezhivayushchee-smert-processa-UI-state-vs-persisted-09-18",
     "title": "состояние, переживающее смерть процесса: UI-state vs persisted"
+  },
+  "q/mvi-mvvm-mvp.md": {
+    "path": "MVI--MVVM--MVP-chto-realno-razlichaetsya-09-23",
+    "url": "https://telegra.ph/MVI--MVVM--MVP-chto-realno-razlichaetsya-09-23",
+    "title": "MVI / MVVM / MVP: что реально различается"
   }
 }

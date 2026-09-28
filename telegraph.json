@@ -43,5 +43,10 @@
     "path": "reducer-chto-dayot-i-chem-platim-09-26",
     "url": "https://telegra.ph/reducer-chto-dayot-i-chem-platim-09-26",
     "title": "reducer: что даёт и чем платим"
+  },
+  "q/races-idempotency.md": {
+    "path": "gonki-pri-parallelnyh-obnovleniyah-idempotentnost-09-28",
+    "url": "https://telegra.ph/gonki-pri-parallelnyh-obnovleniyah-idempotentnost-09-28",
+    "title": "гонки при параллельных обновлениях, идемпотентность"
   }
 }

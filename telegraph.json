@@ -53,5 +53,10 @@
     "path": "oshibka-kak-chast-sostoyaniya-a-ne-isklyuchenie-10-01",
     "url": "https://telegra.ph/oshibka-kak-chast-sostoyaniya-a-ne-isklyuchenie-10-01",
     "title": "ошибка как часть состояния, а не исключение"
+  },
+  "q/form-state.md": {
+    "path": "forma-kak-sostoyanie-validaciya-dirtypristine-10-04",
+    "url": "https://telegra.ph/forma-kak-sostoyanie-validaciya-dirtypristine-10-04",
+    "title": "форма как состояние: валидация, dirty/pristine"
   }
 }

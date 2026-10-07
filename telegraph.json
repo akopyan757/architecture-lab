@@ -58,5 +58,10 @@
     "path": "forma-kak-sostoyanie-validaciya-dirtypristine-10-04",
     "url": "https://telegra.ph/forma-kak-sostoyanie-validaciya-dirtypristine-10-04",
     "title": "форма как состояние: валидация, dirty/pristine"
+  },
+  "q/derived-state.md": {
+    "path": "proizvodnye-sostoyaniya-vychislyat-vs-hranit-10-07",
+    "url": "https://telegra.ph/proizvodnye-sostoyaniya-vychislyat-vs-hranit-10-07",
+    "title": "производные состояния: вычислять vs хранить"
   }
 }
